@@ -1,0 +1,81 @@
+---
+climate: []
+input_number:
+  '5':
+    icon: null
+    max: 10
+    min: 0
+    name: test5
+    step: 0.5
+    unit_of_measurement: °C
+  '6':
+    icon: null
+    max: 10
+    min: 0
+    name: test6
+    step: 0.5
+    unit_of_measurement: °C
+  '7':
+    icon: null
+    max: 10
+    min: 0
+    name: test7
+    step: 0.5
+    unit_of_measurement: °C
+  '8':
+    icon: null
+    max: 10
+    min: 0
+    name: test8
+    step: 0.5
+    unit_of_measurement: °C
+sensor:
+- name: test1
+  platform: mqtt
+  state_topic: homeassistant/sensor/1/state
+  unit_of_measurement: °C
+- availability_topic: homeassistant/sensor/2/available
+  name: test2
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  state_topic: homeassistant/sensor/2/state
+  unit_of_measurement: °C
+- name: test3
+  platform: mqtt
+  state_topic: /my/topic
+  unit_of_measurement: °C
+  value_template: '{{ value_json.3 }}'
+- availability_topic: homeassistant/sensor/4/available
+  name: test4
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  state_topic: /my/topic
+  unit_of_measurement: °C
+  value_template: '{{ value_json.4 }}'
+- name: test5
+  platform: mqtt
+  state_topic: homeassistant/sensor/5/state
+  unit_of_measurement: °C
+- availability_topic: homeassistant/sensor/6/available
+  name: test6
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  state_topic: homeassistant/sensor/6/state
+  unit_of_measurement: °C
+- name: test7
+  platform: mqtt
+  state_topic: /my/topic
+  unit_of_measurement: °C
+  value_template: '{{ value_json.7 }}'
+- availability_topic: homeassistant/sensor/8/available
+  name: test8
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  state_topic: /my/topic
+  unit_of_measurement: °C
+  value_template: '{{ value_json.8 }}'
+switch: []

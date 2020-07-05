@@ -1,0 +1,45 @@
+---
+climate: []
+input_number: {}
+sensor: []
+switch:
+- command_topic: homeassistant/switch/1/cmd
+  name: test1
+  payload_off: 'off'
+  payload_on: 'on'
+  platform: mqtt
+  state_off: 'off'
+  state_on: 'on'
+  state_topic: homeassistant/switch/1/state
+- availability_topic: homeassistant/switch/2/available
+  command_topic: homeassistant/switch/2/cmd
+  name: test2
+  payload_available: online
+  payload_not_available: offline
+  payload_off: 'off'
+  payload_on: 'on'
+  platform: mqtt
+  state_off: 'off'
+  state_on: 'on'
+  state_topic: homeassistant/switch/2/state
+- command_topic: homeassistant/switch/3/cmd
+  name: test3
+  payload_off: 'off'
+  payload_on: 'on'
+  platform: mqtt
+  state_off: 'off'
+  state_on: 'on'
+  state_topic: /my/topic
+  value_template: '{{ value_json.3 }}'
+- availability_topic: homeassistant/switch/4/available
+  command_topic: homeassistant/switch/4/cmd
+  name: test4
+  payload_available: online
+  payload_not_available: offline
+  payload_off: 'off'
+  payload_on: 'on'
+  platform: mqtt
+  state_off: 'off'
+  state_on: 'on'
+  state_topic: /my/topic
+  value_template: '{{ value_json.4 }}'
