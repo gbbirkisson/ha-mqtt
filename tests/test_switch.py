@@ -3,7 +3,7 @@ from unittest import TestCase
 from mqtt import MqttSharedTopic
 from switch import Switch
 from tests.mock_mqtt import MockMqtt
-from util import config_creator
+from util import create_ha_config
 
 
 class Swi(Switch):
@@ -64,8 +64,6 @@ class TestSwitch(TestCase):
         mqtt.assert_messages('/my/topic', [{"test_id": "off"}])
         mqtt.assert_messages('homeassistant/switch/test_id/available', ["online"])
 
-
-class TestConfigPrint(TestCase):
     def test_print(self):
         mqtt = MockMqtt(self)
         state = MqttSharedTopic(mqtt, "/my/topic")
@@ -80,4 +78,4 @@ class TestConfigPrint(TestCase):
         config = file.read()
         file.close()
 
-        self.assertEqual(config, config_creator(components))
+        self.assertEqual(config, create_ha_config(components))

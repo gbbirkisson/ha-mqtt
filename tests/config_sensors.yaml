@@ -78,4 +78,9 @@ sensor:
   state_topic: /my/topic
   unit_of_measurement: °C
   value_template: '{{ value_json.8 }}'
+- icon: mdi:alarm-light
+  name: errors
+  platform: mqtt
+  state_topic: homeassistant/sensor/errors/state
+  unit_of_measurement: errors
 switch: []

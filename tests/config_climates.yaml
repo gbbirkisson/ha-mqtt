@@ -1,0 +1,69 @@
+---
+climate:
+- current_temperature_topic: homeassistant/climate/1/stateCurrTemp
+  max_temp: '100'
+  min_temp: '0'
+  mode_command_topic: homeassistant/climate/1/cmdMode
+  mode_state_topic: homeassistant/climate/1/stateMode
+  modes:
+  - 'off'
+  - heating
+  name: test1
+  platform: mqtt
+  temp_step: '1'
+  temperature_command_topic: homeassistant/climate/1/cmdTargetTemp
+  temperature_state_topic: homeassistant/climate/1/stateTargetTemp
+- availability_topic: homeassistant/climate/2/available
+  current_temperature_topic: homeassistant/climate/2/stateCurrTemp
+  max_temp: '100'
+  min_temp: '0'
+  mode_command_topic: homeassistant/climate/2/cmdMode
+  mode_state_topic: homeassistant/climate/2/stateMode
+  modes:
+  - 'off'
+  - heating
+  name: test2
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  temp_step: '1'
+  temperature_command_topic: homeassistant/climate/2/cmdTargetTemp
+  temperature_state_topic: homeassistant/climate/2/stateTargetTemp
+- current_temperature_template: '{{ value_json.3_curr_temp }}'
+  current_temperature_topic: /my/topic
+  max_temp: '100'
+  min_temp: '0'
+  mode_command_topic: homeassistant/climate/3/cmdMode
+  mode_state_template: '{{ value_json.3_mode }}'
+  mode_state_topic: /my/topic
+  modes:
+  - 'off'
+  - heating
+  name: test3
+  platform: mqtt
+  temp_step: '1'
+  temperature_command_topic: homeassistant/climate/3/cmdTargetTemp
+  temperature_state_template: '{{ value_json.3_target_temp }}'
+  temperature_state_topic: /my/topic
+- availability_topic: homeassistant/climate/4/available
+  current_temperature_template: '{{ value_json.4_curr_temp }}'
+  current_temperature_topic: /my/topic
+  max_temp: '100'
+  min_temp: '0'
+  mode_command_topic: homeassistant/climate/4/cmdMode
+  mode_state_template: '{{ value_json.4_mode }}'
+  mode_state_topic: /my/topic
+  modes:
+  - 'off'
+  - heating
+  name: test4
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  temp_step: '1'
+  temperature_command_topic: homeassistant/climate/4/cmdTargetTemp
+  temperature_state_template: '{{ value_json.4_target_temp }}'
+  temperature_state_topic: /my/topic
+input_number: {}
+sensor: []
+switch: []

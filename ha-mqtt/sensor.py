@@ -1,9 +1,16 @@
+import logging
+import sys
+
 from ha import _Base
 from mqtt import MqttTopic, MqttSharedTopic
 
 
 def state_formatter(state):
     return "{0:.2f}".format(state)
+
+
+def state_formatter_no_decimals(state):
+    return "{0:.0f}".format(state)
 
 
 def state_parser(state):
@@ -15,7 +22,7 @@ def state_send_update_condition(old_state, new_state):
 
 
 class Sensor(_Base):
-    def __init__(self, sensor_id, sensor_name, unit_of_measurement, state_func=None,
+    def __init__(self, sensor_id, sensor_name, unit_of_measurement, state_func=lambda x: x,
                  state_formatter_func=state_formatter, mqtt=None, state_topic=None, **kwargs):
         super().__init__(mqtt=mqtt, component_id=sensor_id, component_name=sensor_name, component_type='sensor',
                          **kwargs)
@@ -55,12 +62,12 @@ class Sensor(_Base):
 
 class SettableSensor(Sensor):
     def __init__(self, sensor_id, sensor_name, unit_of_measurement, min_state, max_state, step_state, initial_state,
-                 state_parser_func=state_parser,
+                 state_change_func=lambda x: x, state_parser_func=state_parser,
                  state_send_update_condition_func=state_send_update_condition, mqtt=None, **kwargs):
         self._state = initial_state
         super().__init__(sensor_id, sensor_name, unit_of_measurement, mqtt=mqtt, state_func=lambda: self._state,
                          **kwargs)
-
+        self._state_change_func = state_change_func
         self._min_state = min_state
         self._max_state = max_state
         self._step_state = step_state
@@ -74,6 +81,7 @@ class SettableSensor(Sensor):
     def _receive_command(self, new_state):
         old_state = self._state
         self._state = self._state_parser_func(new_state)
+        self._state_change_func(self._state)
         if self._state_send_update_condition_func(old_state, self._state):
             self.send_update()
 
@@ -85,3 +93,21 @@ class SettableSensor(Sensor):
 
     def get_step_state(self):
         return self._step_state
+
+
+class ErrorSensor(Sensor):
+    def __init__(self, sensor_id, sensor_name, **kwargs):
+        self._errors = 0
+        super().__init__(sensor_id, sensor_name, 'errors', lambda: self._errors, state_formatter_no_decimals,
+                         icon='mdi:alarm-light', **kwargs)
+
+    def wrap_call(self, func):
+        def wrapper():
+            try:
+                return func()
+            except:
+                self._errors = self._errors + 1
+                e = sys.exc_info()[0]
+                logging.error("Error: %s" % e)
+
+        return wrapper

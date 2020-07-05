@@ -7,12 +7,13 @@ def _state_format(state):
 
 
 class Switch(_Base):
-    def __init__(self, switch_id, switch_name, switch_func=None, state_topic=None, mqtt=None, **kwargs):
+    def __init__(self, switch_id, switch_name, state_change_func=None, state_topic=None, mqtt=None, **kwargs):
         super().__init__(mqtt=mqtt, component_id=switch_id, component_name=switch_name, component_type='switch',
                          **kwargs)
+        assert state_change_func is not None, 'switch_func cannot be None'
 
         command_topic = MqttTopic(mqtt, self.topic_name('cmd'))
-        self._switch_func = switch_func
+        self._state_change_func = state_change_func
         self._state = False
 
         self._add_to_config({
@@ -46,4 +47,5 @@ class Switch(_Base):
 
     def __call__(self, new_state):
         self._state = new_state
+        self._state_change_func(self._state)
         self.send_update()
