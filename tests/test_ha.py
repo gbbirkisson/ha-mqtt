@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from ha import ComponentUpdater
 from mqtt import MqttSharedTopic
+from registry import ComponentRegistry
 from sensor import ErrorSensor
 from tests.mock_mqtt import MockMqtt
 
@@ -9,7 +9,7 @@ from tests.mock_mqtt import MockMqtt
 class TestHa(TestCase):
     def test_manager(self):
         mqtt = MockMqtt(self)
-        updater = ComponentUpdater()
+        registry = ComponentRegistry()
 
         state = MqttSharedTopic(mqtt, "/my/topic")
         sensor1 = ErrorSensor('error1', 'error1', mqtt=mqtt)
@@ -17,14 +17,14 @@ class TestHa(TestCase):
         sensor3 = ErrorSensor('error3', 'error3', mqtt=mqtt, state_topic=state)
         sensor4 = ErrorSensor('error4', 'error3', mqtt=mqtt, state_topic=state, availability_topic=True)
 
-        updater.add_shared_topic(state)
-        updater.add_component(sensor1)
-        updater.add_component(sensor2)
-        updater.add_component(sensor3)
-        updater.add_component(sensor4)
+        registry.add_shared_topic(state)
+        registry.add_component(sensor1)
+        registry.add_component(sensor2)
+        registry.add_component(sensor3)
+        registry.add_component(sensor4)
 
-        with updater:
-            updater.send_updates()
+        with registry:
+            registry.send_updates()
 
         mqtt.assert_messages('homeassistant/sensor/error1/config',
                              [{'icon': 'mdi:alarm-light',

@@ -1,4 +1,5 @@
 ---
+automation: []
 climate:
 - current_temperature_topic: homeassistant/climate/1/stateCurrTemp
   max_temp: '100'
@@ -7,7 +8,7 @@ climate:
   mode_state_topic: homeassistant/climate/1/stateMode
   modes:
   - 'off'
-  - heating
+  - heat
   name: test1
   platform: mqtt
   temp_step: '1'
@@ -21,7 +22,7 @@ climate:
   mode_state_topic: homeassistant/climate/2/stateMode
   modes:
   - 'off'
-  - heating
+  - heat
   name: test2
   payload_available: online
   payload_not_available: offline
@@ -38,7 +39,7 @@ climate:
   mode_state_topic: /my/topic
   modes:
   - 'off'
-  - heating
+  - heat
   name: test3
   platform: mqtt
   temp_step: '1'
@@ -55,7 +56,7 @@ climate:
   mode_state_topic: /my/topic
   modes:
   - 'off'
-  - heating
+  - heat
   name: test4
   payload_available: online
   payload_not_available: offline

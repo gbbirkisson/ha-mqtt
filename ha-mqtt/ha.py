@@ -1,5 +1,4 @@
 import logging
-import time
 
 from mqtt import MqttTopic
 
@@ -122,35 +121,3 @@ class _Base(Ha):
 
     def send_update(self):
         pass
-
-
-class ComponentUpdater:
-    def __init__(self):
-        self._components = []
-        self._shared_topics = []
-
-    def add_component(self, component):
-        self._components.append(component)
-
-    def add_shared_topic(self, topic):
-        self._shared_topics.append(topic)
-
-    def send_updates(self):
-        for c in self._components:
-            c.send_update()
-        for q in self._shared_topics:
-            q.publish()
-
-    def __enter__(self):
-        for c in self._components:
-            c.__enter__()
-
-        time.sleep(1)  # Give home assistant a chance to catch up
-
-        for c in self._components:
-            c.available_set(True)
-        return self
-
-    def __exit__(self, *args):
-        for c in self._components:
-            c.__exit__(args)

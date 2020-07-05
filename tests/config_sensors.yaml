@@ -1,8 +1,82 @@
 ---
+automation:
+- action:
+    data_template:
+      entity_id: input_number.5
+      value: '{{ trigger.payload }}'
+    service: input_number.set_value
+  alias: '5_1'
+  trigger:
+    platform: mqtt
+    topic: homeassistant/sensor/5/state
+- action:
+    data_template:
+      payload: '{{ states(''input_number.5'') | int }}'
+      topic: homeassistant/sensor/5/cmd
+    service: mqtt.publish
+  alias: '5_2'
+  trigger:
+    entity_id: input_number.5
+    platform: state
+- action:
+    data_template:
+      entity_id: input_number.6
+      value: '{{ trigger.payload }}'
+    service: input_number.set_value
+  alias: '6_1'
+  trigger:
+    platform: mqtt
+    topic: homeassistant/sensor/6/state
+- action:
+    data_template:
+      payload: '{{ states(''input_number.6'') | int }}'
+      topic: homeassistant/sensor/6/cmd
+    service: mqtt.publish
+  alias: '6_2'
+  trigger:
+    entity_id: input_number.6
+    platform: state
+- action:
+    data_template:
+      entity_id: input_number.7
+      value: '{{ trigger.payload }}'
+    service: input_number.set_value
+  alias: '7_1'
+  trigger:
+    platform: mqtt
+    topic: /my/topic
+- action:
+    data_template:
+      payload: '{{ states(''input_number.7'') | int }}'
+      topic: homeassistant/sensor/7/cmd
+    service: mqtt.publish
+  alias: '7_2'
+  trigger:
+    entity_id: input_number.7
+    platform: state
+- action:
+    data_template:
+      entity_id: input_number.8
+      value: '{{ trigger.payload }}'
+    service: input_number.set_value
+  alias: '8_1'
+  trigger:
+    platform: mqtt
+    topic: /my/topic
+- action:
+    data_template:
+      payload: '{{ states(''input_number.8'') | int }}'
+      topic: homeassistant/sensor/8/cmd
+    service: mqtt.publish
+  alias: '8_2'
+  trigger:
+    entity_id: input_number.8
+    platform: state
 climate: []
 input_number:
   '5':
     icon: null
+    initial: 7.5
     max: 10
     min: 0
     name: test5
@@ -10,6 +84,7 @@ input_number:
     unit_of_measurement: °C
   '6':
     icon: null
+    initial: 7.5
     max: 10
     min: 0
     name: test6
@@ -17,6 +92,7 @@ input_number:
     unit_of_measurement: °C
   '7':
     icon: null
+    initial: 7.5
     max: 10
     min: 0
     name: test7
@@ -24,6 +100,7 @@ input_number:
     unit_of_measurement: °C
   '8':
     icon: null
+    initial: 7.5
     max: 10
     min: 0
     name: test8

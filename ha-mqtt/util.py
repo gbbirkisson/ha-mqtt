@@ -1,44 +1,7 @@
 import os
 
-import yaml
-
-from climate import Climate
 from mqtt import Mqtt
 from sensor import Sensor, SettableSensor
-from switch import Switch
-
-
-def create_ha_config(components):
-    sensor = []
-    switch = []
-    climate = []
-    input_number = {}
-
-    for c in components:
-        tmp = c.get_config()
-        tmp['platform'] = 'mqtt'
-        if issubclass(type(c), Climate):
-            climate.append(tmp)
-        if issubclass(type(c), Switch):
-            switch.append(tmp)
-        if issubclass(type(c), Sensor):
-            sensor.append(tmp)
-        if issubclass(type(c), SettableSensor):
-            input_number[c.get_id()] = {
-                'name': c.get_name(),
-                'min': c.get_min_state(),
-                'max': c.get_max_state(),
-                'step': c.get_step_state(),
-                'icon': c.get_icon(),
-                'unit_of_measurement': tmp['unit_of_measurement']
-            }
-
-    return yaml.dump({
-        'sensor': sensor,
-        'switch': switch,
-        'climate': climate,
-        'input_number': input_number
-    }, encoding='utf-8', allow_unicode=True, default_flow_style=False, explicit_start=True).decode("utf-8")
 
 
 def create_average_sensor(sensor_id, sensor_name, unit_of_measurement, sensors, **kwargs):
@@ -55,10 +18,22 @@ def create_average_sensor(sensor_id, sensor_name, unit_of_measurement, sensors, 
 
 def create_weighted_average_sensor(sensor_id, sensor_name, unit_of_measurement, min_weight, max_weight,
                                    step_weight, initial_weight, sensors, **kwargs):
+    k = kwargs
+
+    if k.get('state_topic') is not None:
+        state_topic = k.pop('state_topic')
+    else:
+        state_topic = None
+
+    if k.get('icon') is not None:
+        icon = k.pop('icon')
+    else:
+        icon = None
+
     pairs = []
     for s in sensors:
         weight = SettableSensor(s.get_id() + '_weight', s.get_name() + ' weight', '', min_weight, max_weight,
-                                step_weight, initial_weight, **kwargs)
+                                step_weight, initial_weight, icon='mdi:weight', **k)
         pairs.append((s, weight))
 
     def _sensor():
@@ -76,8 +51,22 @@ def create_weighted_average_sensor(sensor_id, sensor_name, unit_of_measurement, 
 
         return res / sum_weights
 
-    return Sensor(sensor_id, sensor_name, unit_of_measurement, _sensor, **kwargs), [
+    k['state_topic'] = state_topic
+    k['icon'] = icon
+    return Sensor(sensor_id, sensor_name, unit_of_measurement, _sensor, **k), [
         weight for therm, weight in pairs]
+
+
+def create_func_result_cache(func):
+    old = [None]
+
+    def w():
+        res = func()
+        if res is not None:
+            old[0] = res
+        return old[0]
+
+    return w
 
 
 def create_func_call_limiter():

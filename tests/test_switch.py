@@ -1,9 +1,9 @@
 from unittest import TestCase
 
 from mqtt import MqttSharedTopic
+from registry import ComponentRegistry
 from switch import Switch
 from tests.mock_mqtt import MockMqtt
-from util import create_ha_config
 
 
 class Swi(Switch):
@@ -67,15 +67,15 @@ class TestSwitch(TestCase):
     def test_print(self):
         mqtt = MockMqtt(self)
         state = MqttSharedTopic(mqtt, "/my/topic")
+        registry = ComponentRegistry()
 
-        components = []
-        components.append(Swi(sid='1', name='test1', mqtt=mqtt))
-        components.append(Swi(sid='2', name='test2', mqtt=mqtt, availability_topic=True))
-        components.append(Swi(sid='3', name='test3', mqtt=mqtt, state_topic=state))
-        components.append(Swi(sid='4', name='test4', mqtt=mqtt, state_topic=state, availability_topic=True))
+        registry.add_component(Swi(sid='1', name='test1', mqtt=mqtt))
+        registry.add_component(Swi(sid='2', name='test2', mqtt=mqtt, availability_topic=True))
+        registry.add_component(Swi(sid='3', name='test3', mqtt=mqtt, state_topic=state))
+        registry.add_component(Swi(sid='4', name='test4', mqtt=mqtt, state_topic=state, availability_topic=True))
 
         file = open('config_switches.yaml', mode='r')
         config = file.read()
         file.close()
 
-        self.assertEqual(config, create_ha_config(components))
+        self.assertEqual(config, registry.create_config())

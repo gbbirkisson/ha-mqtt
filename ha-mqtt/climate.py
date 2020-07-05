@@ -26,9 +26,9 @@ class Climate(_Base):
 
         modes = ['off']
         if heat:
-            modes.append('heating')
+            modes.append('heat')
         if cool:
-            modes.append('cooling')
+            modes.append('cool')
 
         topic_command_mode = MqttTopic(mqtt, self.topic_name('cmdMode'))
         topic_command_target_temp = MqttTopic(mqtt, self.topic_name('cmdTargetTemp'))

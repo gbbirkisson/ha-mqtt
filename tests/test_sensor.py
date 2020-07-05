@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from ha import ComponentUpdater
 from mqtt import MqttSharedTopic
+from registry import ComponentRegistry
 from sensor import Sensor, SettableSensor, ErrorSensor
 from tests.mock_mqtt import MockMqtt
-from util import create_ha_config, create_average_sensor, create_weighted_average_sensor
+from util import create_average_sensor, create_weighted_average_sensor
 
 
 class Sen(Sensor):
@@ -116,29 +116,29 @@ class TestSettableSensor(TestCase):
     def test_print(self):
         mqtt = MockMqtt(self)
         state = MqttSharedTopic(mqtt, "/my/topic")
+        registry = ComponentRegistry()
 
-        components = []
-        components.append(Sen(sid='1', name='test1', mqtt=mqtt))
-        components.append(Sen(sid='2', name='test2', mqtt=mqtt, availability_topic=True))
-        components.append(Sen(sid='3', name='test3', mqtt=mqtt, state_topic=state))
-        components.append(Sen(sid='4', name='test4', mqtt=mqtt, state_topic=state, availability_topic=True))
-        components.append(SetSen(sid='5', name='test5', mqtt=mqtt))
-        components.append(SetSen(sid='6', name='test6', mqtt=mqtt, availability_topic=True))
-        components.append(SetSen(sid='7', name='test7', mqtt=mqtt, state_topic=state))
-        components.append(SetSen(sid='8', name='test8', mqtt=mqtt, state_topic=state, availability_topic=True))
-        components.append(ErrorSensor('errors', 'errors', mqtt=mqtt))
+        registry.add_component(Sen(sid='1', name='test1', mqtt=mqtt))
+        registry.add_component(Sen(sid='2', name='test2', mqtt=mqtt, availability_topic=True))
+        registry.add_component(Sen(sid='3', name='test3', mqtt=mqtt, state_topic=state))
+        registry.add_component(Sen(sid='4', name='test4', mqtt=mqtt, state_topic=state, availability_topic=True))
+        registry.add_component(SetSen(sid='5', name='test5', mqtt=mqtt))
+        registry.add_component(SetSen(sid='6', name='test6', mqtt=mqtt, availability_topic=True))
+        registry.add_component(SetSen(sid='7', name='test7', mqtt=mqtt, state_topic=state))
+        registry.add_component(SetSen(sid='8', name='test8', mqtt=mqtt, state_topic=state, availability_topic=True))
+        registry.add_component(ErrorSensor('errors', 'errors', mqtt=mqtt))
 
         file = open('config_sensors.yaml', mode='r')
         config = file.read()
         file.close()
 
-        self.assertEqual(config, create_ha_config(components))
+        self.assertEqual(config, registry.create_config())
 
 
 class TestUtil(TestCase):
     def test_average(self):
         mqtt = MockMqtt(self)
-        updater = ComponentUpdater()
+        registry = ComponentRegistry()
         state = MqttSharedTopic(mqtt, "/my/topic")
 
         sensor1 = Sen(sid='s1', name='s1', mqtt=mqtt, state_topic=state, state_func=lambda: 1)
@@ -150,21 +150,21 @@ class TestUtil(TestCase):
         s1 = create_average_sensor('test1', 'test1', '°C', sensors, mqtt=mqtt, state_topic=state)
         s2, weights = create_weighted_average_sensor('test2', 'test2', '°C', 0, 100, 1, 50, sensors, mqtt=mqtt,
                                                      state_topic=state)
-        updater.add_component(sensor1)
-        updater.add_component(sensor2)
-        updater.add_component(sensor3)
-        updater.add_component(s1)
-        updater.add_component(s2)
-        updater.add_shared_topic(state)
+        registry.add_component(sensor1)
+        registry.add_component(sensor2)
+        registry.add_component(sensor3)
+        registry.add_component(s1)
+        registry.add_component(s2)
+        registry.add_shared_topic(state)
         for w in weights:
-            updater.add_component(w)
+            registry.add_component(w)
 
-        with updater:
-            updater.send_updates()
+        with registry:
+            registry.send_updates()
             mqtt.publish('homeassistant/sensor/s1_weight/cmd', '20')
             mqtt.publish('homeassistant/sensor/s2_weight/cmd', '40')
             mqtt.publish('homeassistant/sensor/s3_weight/cmd', '80')
-            updater.send_updates()
+            registry.send_updates()
 
         mqtt.assert_messages('homeassistant/sensor/s1/config',
                              [{'name': 's1',
@@ -197,37 +197,26 @@ class TestUtil(TestCase):
                                'value_template': '{{ value_json.test2 }}'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s1_weight/config',
-                             [{'name': 's1 weight',
-                               'state_topic': '/my/topic',
-                               'unit_of_measurement': '',
-                               'value_template': '{{ value_json.s1_weight }}'},
+                             [{'icon': 'mdi:weight',
+                               'name': 's1 weight',
+                               'state_topic': 'homeassistant/sensor/s1_weight/state',
+                               'unit_of_measurement': ''},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s2_weight/config',
-                             [{'name': 's2 weight',
-                               'state_topic': '/my/topic',
-                               'unit_of_measurement': '',
-                               'value_template': '{{ value_json.s2_weight }}'},
+                             [{'icon': 'mdi:weight',
+                               'name': 's2 weight',
+                               'state_topic': 'homeassistant/sensor/s2_weight/state',
+                               'unit_of_measurement': ''},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s3_weight/config',
-                             [{'name': 's3 weight',
-                               'state_topic': '/my/topic',
-                               'unit_of_measurement': '',
-                               'value_template': '{{ value_json.s3_weight }}'},
+                             [{'icon': 'mdi:weight',
+                               'name': 's3 weight',
+                               'state_topic': 'homeassistant/sensor/s3_weight/state',
+                               'unit_of_measurement': ''},
                               None])
         mqtt.assert_messages('/my/topic',
-                             [{'s1': '1.00',
-                               's1_weight': '50.00',
-                               's2': '4.00',
-                               's2_weight': '50.00',
-                               's3': '7.00',
-                               's3_weight': '50.00',
-                               'test1': '4.00',
-                               'test2': '4.00'},
-                              {'s1': '1.00',
-                               's1_weight': '20.00',
-                               's2': '4.00',
-                               's2_weight': '40.00',
-                               's3': '7.00',
-                               's3_weight': '80.00',
-                               'test1': '4.00',
-                               'test2': '5.29'}])
+                             [{'s1': '1.00', 's2': '4.00', 's3': '7.00', 'test1': '4.00', 'test2': '4.00'},
+                              {'s1': '1.00', 's2': '4.00', 's3': '7.00', 'test1': '4.00', 'test2': '5.29'}])
+        mqtt.assert_messages('homeassistant/sensor/s1_weight/state', ['50.00', '20.00', '20.00'])
+        mqtt.assert_messages('homeassistant/sensor/s2_weight/state', ['50.00', '40.00', '40.00'])
+        mqtt.assert_messages('homeassistant/sensor/s3_weight/state', ['50.00', '80.00', '80.00'])

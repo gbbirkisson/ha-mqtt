@@ -1,5 +1,6 @@
 import logging
 import sys
+import traceback
 
 from ha import _Base
 from mqtt import MqttTopic, MqttSharedTopic
@@ -74,8 +75,9 @@ class SettableSensor(Sensor):
         self._state = initial_state
         self._state_parser_func = state_parser_func
         self._state_send_update_condition_func = state_send_update_condition_func
+        self._cmd_topic = self.topic_name('cmd')
 
-        command_topic = MqttTopic(mqtt, self.topic_name('cmd'))
+        command_topic = MqttTopic(mqtt, self._cmd_topic)
         command_topic.subscribe(lambda new_state: self._receive_command(new_state))
 
     def _receive_command(self, new_state):
@@ -84,6 +86,12 @@ class SettableSensor(Sensor):
         self._state_change_func(self._state)
         if self._state_send_update_condition_func(old_state, self._state):
             self.send_update()
+
+    def get_state_topic_name(self):
+        return self._state_topic.name()
+
+    def get_cmd_topic_name(self):
+        return self._cmd_topic
 
     def get_min_state(self):
         return self._min_state
@@ -101,7 +109,7 @@ class ErrorSensor(Sensor):
         super().__init__(sensor_id, sensor_name, 'errors', lambda: self._errors, state_formatter_no_decimals,
                          icon='mdi:alarm-light', **kwargs)
 
-    def wrap_call(self, func):
+    def wrap_function(self, func):
         def wrapper():
             try:
                 return func()
@@ -109,5 +117,7 @@ class ErrorSensor(Sensor):
                 self._errors = self._errors + 1
                 e = sys.exc_info()[0]
                 logging.error("Error: %s" % e)
+                traceback.print_exc(file=sys.stdout)
+                return None
 
         return wrapper
