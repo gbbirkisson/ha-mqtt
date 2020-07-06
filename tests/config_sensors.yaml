@@ -110,6 +110,7 @@ sensor:
 - name: Test 1
   platform: mqtt
   state_topic: homeassistant/sensor/test_1/state
+  unique_id: test_1
   unit_of_measurement: °C
 - availability_topic: homeassistant/sensor/test_2/available
   name: Test 2
@@ -117,10 +118,12 @@ sensor:
   payload_not_available: offline
   platform: mqtt
   state_topic: homeassistant/sensor/test_2/state
+  unique_id: test_2
   unit_of_measurement: °C
 - name: Test 3
   platform: mqtt
   state_topic: /my/topic
+  unique_id: test_3
   unit_of_measurement: °C
   value_template: '{{ value_json.test_3 }}'
 - availability_topic: homeassistant/sensor/test_4/available
@@ -129,11 +132,13 @@ sensor:
   payload_not_available: offline
   platform: mqtt
   state_topic: /my/topic
+  unique_id: test_4
   unit_of_measurement: °C
   value_template: '{{ value_json.test_4 }}'
 - name: Test 5
   platform: mqtt
   state_topic: homeassistant/sensor/test_5/state
+  unique_id: test_5
   unit_of_measurement: °C
 - availability_topic: homeassistant/sensor/test_6/available
   name: Test 6
@@ -141,10 +146,12 @@ sensor:
   payload_not_available: offline
   platform: mqtt
   state_topic: homeassistant/sensor/test_6/state
+  unique_id: test_6
   unit_of_measurement: °C
 - name: Test 7
   platform: mqtt
   state_topic: /my/topic
+  unique_id: test_7
   unit_of_measurement: °C
   value_template: '{{ value_json.test_7 }}'
 - availability_topic: homeassistant/sensor/test_8/available
@@ -153,11 +160,13 @@ sensor:
   payload_not_available: offline
   platform: mqtt
   state_topic: /my/topic
+  unique_id: test_8
   unit_of_measurement: °C
   value_template: '{{ value_json.test_8 }}'
 - icon: mdi:alarm-light
   name: errors
   platform: mqtt
   state_topic: homeassistant/sensor/errors/state
+  unique_id: errors
   unit_of_measurement: errors
 switch: []

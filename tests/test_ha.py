@@ -30,7 +30,8 @@ class TestHa(TestCase):
                              [{'icon': 'mdi:alarm-light',
                                'name': 'Error 1',
                                'state_topic': 'homeassistant/sensor/error_1/state',
-                               'unit_of_measurement': 'errors'},
+                               'unit_of_measurement': 'errors',
+                               'unique_id': 'error_1'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/error_2/config',
                              [{'availability_topic': 'homeassistant/sensor/error_2/available',
@@ -39,14 +40,16 @@ class TestHa(TestCase):
                                'payload_available': 'online',
                                'payload_not_available': 'offline',
                                'state_topic': 'homeassistant/sensor/error_2/state',
-                               'unit_of_measurement': 'errors'},
+                               'unit_of_measurement': 'errors',
+                               'unique_id': 'error_2'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/error_3/config',
                              [{'icon': 'mdi:alarm-light',
                                'name': 'Error 3',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': 'errors',
-                               'value_template': '{{ value_json.error_3 }}'},
+                               'value_template': '{{ value_json.error_3 }}',
+                               'unique_id': 'error_3'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/error_4/config',
                              [{'availability_topic': 'homeassistant/sensor/error_4/available',
@@ -56,7 +59,8 @@ class TestHa(TestCase):
                                'payload_not_available': 'offline',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': 'errors',
-                               'value_template': '{{ value_json.error_4 }}'},
+                               'value_template': '{{ value_json.error_4 }}',
+                               'unique_id': 'error_4'},
                               None])
 
         mqtt.assert_messages('homeassistant/sensor/error_1/available', None)

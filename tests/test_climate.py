@@ -50,7 +50,8 @@ class TestSwitch(TestCase):
                                'name': 'Test Name',
                                'temp_step': '1',
                                'temperature_command_topic': 'homeassistant/climate/test_name/cmdTargetTemp',
-                               'temperature_state_topic': 'homeassistant/climate/test_name/stateTargetTemp'},
+                               'temperature_state_topic': 'homeassistant/climate/test_name/stateTargetTemp',
+                               'unique_id': 'test_name'},
                               None])
 
         mqtt.assert_messages('homeassistant/climate/test_name/stateCurrTemp', ['7.50', '8.50', '9.50'])
@@ -92,7 +93,8 @@ class TestSwitch(TestCase):
                                'temp_step': '1',
                                'temperature_command_topic': 'homeassistant/climate/test_name/cmdTargetTemp',
                                'temperature_state_template': '{{ value_json.test_name_target_temp }}',
-                               'temperature_state_topic': '/my/topic'},
+                               'temperature_state_topic': '/my/topic',
+                               'unique_id': 'test_name'},
                               None])
 
         mqtt.assert_messages('homeassistant/climate/test_name/available', ['online'])

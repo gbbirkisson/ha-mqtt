@@ -12,6 +12,7 @@ switch:
   state_off: 'off'
   state_on: 'on'
   state_topic: homeassistant/switch/test_1/state
+  unique_id: test_1
 - availability_topic: homeassistant/switch/test_2/available
   command_topic: homeassistant/switch/test_2/cmd
   name: Test 2
@@ -23,6 +24,7 @@ switch:
   state_off: 'off'
   state_on: 'on'
   state_topic: homeassistant/switch/test_2/state
+  unique_id: test_2
 - command_topic: homeassistant/switch/test_3/cmd
   name: Test 3
   payload_off: 'off'
@@ -31,6 +33,7 @@ switch:
   state_off: 'off'
   state_on: 'on'
   state_topic: /my/topic
+  unique_id: test_3
   value_template: '{{ value_json.test_3 }}'
 - availability_topic: homeassistant/switch/test_2/available
   command_topic: homeassistant/switch/test_2/cmd
@@ -43,4 +46,5 @@ switch:
   state_off: 'off'
   state_on: 'on'
   state_topic: /my/topic
+  unique_id: test_2
   value_template: '{{ value_json.test_2 }}'

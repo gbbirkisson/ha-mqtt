@@ -29,7 +29,8 @@ class TestSwitch(TestCase):
                                'payload_on': 'on',
                                'state_off': 'off',
                                'state_on': 'on',
-                               'state_topic': 'homeassistant/switch/test_name/state'},
+                               'state_topic': 'homeassistant/switch/test_name/state',
+                               'unique_id': 'test_name'},
                               None])
 
         mqtt.assert_messages('homeassistant/switch/test_name/state', ["off", "on"])
@@ -57,7 +58,8 @@ class TestSwitch(TestCase):
                                'state_off': 'off',
                                'state_on': 'on',
                                'state_topic': '/my/topic',
-                               'value_template': '{{ value_json.test_name }}'},
+                               'value_template': '{{ value_json.test_name }}',
+                               'unique_id': 'test_name'},
                               None])
 
         mqtt.assert_messages('/my/topic', [{"test_name": "off"}])

@@ -26,7 +26,8 @@ class TestSensor(TestCase):
         mqtt.assert_messages('homeassistant/sensor/test_name/config', [
             {'name': 'Test Name',
              'state_topic': 'homeassistant/sensor/test_name/state',
-             'unit_of_measurement': '°C'},
+             'unit_of_measurement': '°C',
+             'unique_id': 'test_name'},
             None
         ])
 
@@ -51,7 +52,8 @@ class TestSensor(TestCase):
                                'payload_not_available': 'offline',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.test_name }}'},
+                               'value_template': '{{ value_json.test_name }}',
+                               'unique_id': 'test_name'},
                               None])
 
         mqtt.assert_messages('/my/topic', [{"test_name": "1.24"}])
@@ -77,7 +79,8 @@ class TestSettableSensor(TestCase):
         mqtt.assert_messages('homeassistant/sensor/test_name/config', [
             {'name': 'Test Name',
              'state_topic': 'homeassistant/sensor/test_name/state',
-             'unit_of_measurement': '°C'},
+             'unit_of_measurement': '°C',
+             'unique_id': 'test_name'},
             None
         ])
 
@@ -104,7 +107,8 @@ class TestSettableSensor(TestCase):
                                'payload_not_available': 'offline',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.test_name }}'},
+                               'value_template': '{{ value_json.test_name }}',
+                               'unique_id': 'test_name'},
                               None])
 
         mqtt.assert_messages('/my/topic', [{"test_name": "7.50"}, {"test_name": "3.68"}])
@@ -167,49 +171,57 @@ class TestUtil(TestCase):
                              [{'name': 'S 1',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.s_1 }}'},
+                               'value_template': '{{ value_json.s_1 }}',
+                               'unique_id': 's_1'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s_2/config',
                              [{'name': 'S 2',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.s_2 }}'},
+                               'value_template': '{{ value_json.s_2 }}',
+                               'unique_id': 's_2'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s_3/config',
                              [{'name': 'S 3',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.s_3 }}'},
+                               'value_template': '{{ value_json.s_3 }}',
+                               'unique_id': 's_3'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/test_1/config',
                              [{'name': 'Test 1',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.test_1 }}'},
+                               'value_template': '{{ value_json.test_1 }}',
+                               'unique_id': 'test_1'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/test_2/config',
                              [{'name': 'Test 2',
                                'state_topic': '/my/topic',
                                'unit_of_measurement': '°C',
-                               'value_template': '{{ value_json.test_2 }}'},
+                               'value_template': '{{ value_json.test_2 }}',
+                               'unique_id': 'test_2'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s_1_weight/config',
                              [{'icon': 'mdi:weight',
                                'name': 'S 1 weight',
                                'state_topic': 'homeassistant/sensor/s_1_weight/state',
-                               'unit_of_measurement': ''},
+                               'unit_of_measurement': '',
+                               'unique_id': 's_1_weight'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s_2_weight/config',
                              [{'icon': 'mdi:weight',
                                'name': 'S 2 weight',
                                'state_topic': 'homeassistant/sensor/s_2_weight/state',
-                               'unit_of_measurement': ''},
+                               'unit_of_measurement': '',
+                               'unique_id': 's_2_weight'},
                               None])
         mqtt.assert_messages('homeassistant/sensor/s_3_weight/config',
                              [{'icon': 'mdi:weight',
                                'name': 'S 3 weight',
                                'state_topic': 'homeassistant/sensor/s_3_weight/state',
-                               'unit_of_measurement': ''},
+                               'unit_of_measurement': '',
+                               'unique_id': 's_3_weight'},
                               None])
         mqtt.assert_messages('/my/topic',
                              [{'s_1': '1.00', 's_2': '4.00', 's_3': '7.00', 'test_1': '4.00', 'test_2': '4.00'},
