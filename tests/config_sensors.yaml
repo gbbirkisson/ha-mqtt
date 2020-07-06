@@ -2,159 +2,159 @@
 automation:
 - action:
     data_template:
-      entity_id: input_number.5
+      entity_id: input_number.test_5
       value: '{{ trigger.payload }}'
     service: input_number.set_value
-  alias: '5_1'
+  alias: test_5_1
   trigger:
     platform: mqtt
-    topic: homeassistant/sensor/5/state
+    topic: homeassistant/sensor/test_5/state
 - action:
     data_template:
-      payload: '{{ states(''input_number.5'') | int }}'
-      topic: homeassistant/sensor/5/cmd
+      payload: '{{ states(''input_number.test_5'') | int }}'
+      topic: homeassistant/sensor/test_5/cmd
     service: mqtt.publish
-  alias: '5_2'
+  alias: test_5_2
   trigger:
-    entity_id: input_number.5
+    entity_id: input_number.test_5
     platform: state
 - action:
     data_template:
-      entity_id: input_number.6
+      entity_id: input_number.test_6
       value: '{{ trigger.payload }}'
     service: input_number.set_value
-  alias: '6_1'
+  alias: test_6_1
   trigger:
     platform: mqtt
-    topic: homeassistant/sensor/6/state
+    topic: homeassistant/sensor/test_6/state
 - action:
     data_template:
-      payload: '{{ states(''input_number.6'') | int }}'
-      topic: homeassistant/sensor/6/cmd
+      payload: '{{ states(''input_number.test_6'') | int }}'
+      topic: homeassistant/sensor/test_6/cmd
     service: mqtt.publish
-  alias: '6_2'
+  alias: test_6_2
   trigger:
-    entity_id: input_number.6
+    entity_id: input_number.test_6
     platform: state
 - action:
     data_template:
-      entity_id: input_number.7
+      entity_id: input_number.test_7
       value: '{{ trigger.payload }}'
     service: input_number.set_value
-  alias: '7_1'
+  alias: test_7_1
   trigger:
     platform: mqtt
     topic: /my/topic
 - action:
     data_template:
-      payload: '{{ states(''input_number.7'') | int }}'
-      topic: homeassistant/sensor/7/cmd
+      payload: '{{ states(''input_number.test_7'') | int }}'
+      topic: homeassistant/sensor/test_7/cmd
     service: mqtt.publish
-  alias: '7_2'
+  alias: test_7_2
   trigger:
-    entity_id: input_number.7
+    entity_id: input_number.test_7
     platform: state
 - action:
     data_template:
-      entity_id: input_number.8
+      entity_id: input_number.test_8
       value: '{{ trigger.payload }}'
     service: input_number.set_value
-  alias: '8_1'
+  alias: test_8_1
   trigger:
     platform: mqtt
     topic: /my/topic
 - action:
     data_template:
-      payload: '{{ states(''input_number.8'') | int }}'
-      topic: homeassistant/sensor/8/cmd
+      payload: '{{ states(''input_number.test_8'') | int }}'
+      topic: homeassistant/sensor/test_8/cmd
     service: mqtt.publish
-  alias: '8_2'
+  alias: test_8_2
   trigger:
-    entity_id: input_number.8
+    entity_id: input_number.test_8
     platform: state
 climate: []
 input_number:
-  '5':
+  test_5:
     icon: null
     initial: 7.5
     max: 10
     min: 0
-    name: test5
+    name: Test 5
     step: 0.5
     unit_of_measurement: °C
-  '6':
+  test_6:
     icon: null
     initial: 7.5
     max: 10
     min: 0
-    name: test6
+    name: Test 6
     step: 0.5
     unit_of_measurement: °C
-  '7':
+  test_7:
     icon: null
     initial: 7.5
     max: 10
     min: 0
-    name: test7
+    name: Test 7
     step: 0.5
     unit_of_measurement: °C
-  '8':
+  test_8:
     icon: null
     initial: 7.5
     max: 10
     min: 0
-    name: test8
+    name: Test 8
     step: 0.5
     unit_of_measurement: °C
 sensor:
-- name: test1
+- name: Test 1
   platform: mqtt
-  state_topic: homeassistant/sensor/1/state
+  state_topic: homeassistant/sensor/test_1/state
   unit_of_measurement: °C
-- availability_topic: homeassistant/sensor/2/available
-  name: test2
+- availability_topic: homeassistant/sensor/test_2/available
+  name: Test 2
   payload_available: online
   payload_not_available: offline
   platform: mqtt
-  state_topic: homeassistant/sensor/2/state
+  state_topic: homeassistant/sensor/test_2/state
   unit_of_measurement: °C
-- name: test3
+- name: Test 3
   platform: mqtt
   state_topic: /my/topic
   unit_of_measurement: °C
-  value_template: '{{ value_json.3 }}'
-- availability_topic: homeassistant/sensor/4/available
-  name: test4
-  payload_available: online
-  payload_not_available: offline
-  platform: mqtt
-  state_topic: /my/topic
-  unit_of_measurement: °C
-  value_template: '{{ value_json.4 }}'
-- name: test5
-  platform: mqtt
-  state_topic: homeassistant/sensor/5/state
-  unit_of_measurement: °C
-- availability_topic: homeassistant/sensor/6/available
-  name: test6
-  payload_available: online
-  payload_not_available: offline
-  platform: mqtt
-  state_topic: homeassistant/sensor/6/state
-  unit_of_measurement: °C
-- name: test7
-  platform: mqtt
-  state_topic: /my/topic
-  unit_of_measurement: °C
-  value_template: '{{ value_json.7 }}'
-- availability_topic: homeassistant/sensor/8/available
-  name: test8
+  value_template: '{{ value_json.test_3 }}'
+- availability_topic: homeassistant/sensor/test_4/available
+  name: Test 4
   payload_available: online
   payload_not_available: offline
   platform: mqtt
   state_topic: /my/topic
   unit_of_measurement: °C
-  value_template: '{{ value_json.8 }}'
+  value_template: '{{ value_json.test_4 }}'
+- name: Test 5
+  platform: mqtt
+  state_topic: homeassistant/sensor/test_5/state
+  unit_of_measurement: °C
+- availability_topic: homeassistant/sensor/test_6/available
+  name: Test 6
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  state_topic: homeassistant/sensor/test_6/state
+  unit_of_measurement: °C
+- name: Test 7
+  platform: mqtt
+  state_topic: /my/topic
+  unit_of_measurement: °C
+  value_template: '{{ value_json.test_7 }}'
+- availability_topic: homeassistant/sensor/test_8/available
+  name: Test 8
+  payload_available: online
+  payload_not_available: offline
+  platform: mqtt
+  state_topic: /my/topic
+  unit_of_measurement: °C
+  value_template: '{{ value_json.test_8 }}'
 - icon: mdi:alarm-light
   name: errors
   platform: mqtt

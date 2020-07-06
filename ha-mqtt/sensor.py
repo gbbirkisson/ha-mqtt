@@ -1,35 +1,48 @@
 import logging
-import sys
-import traceback
 
 from ha import _Base
 from mqtt import MqttTopic, MqttSharedTopic
+from util import create_id
 
 
-def state_formatter(state):
+def state_formatter_func_default(state):
     return "{0:.2f}".format(state)
 
 
-def state_formatter_no_decimals(state):
+def state_formatter_func_no_decimals(state):
     return "{0:.0f}".format(state)
 
 
-def state_parser(state):
+def state_parser_func_default(state):
     return float(state)
 
 
-def state_send_update_condition(old_state, new_state):
+def state_send_update_condition_func_default(old_state, new_state):
     return abs(old_state - new_state) > 1e-1
 
 
+def state_change_func_default(new_state):
+    pass
+
+
 class Sensor(_Base):
-    def __init__(self, sensor_id, sensor_name, unit_of_measurement, state_func=lambda x: x,
-                 state_formatter_func=state_formatter, mqtt=None, state_topic=None, **kwargs):
-        super().__init__(mqtt=mqtt, component_id=sensor_id, component_name=sensor_name, component_type='sensor',
+    def __init__(
+            self,
+            sensor_name,
+            unit_of_measurement,
+            sensor_id=None,
+            state_func=None,
+            state_formatter_func=state_formatter_func_default,
+            state_topic=None,
+            **kwargs
+    ):
+        super().__init__(component_id=create_id(sensor_id, sensor_name), component_name=sensor_name,
+                         component_type='sensor',
                          **kwargs)
 
         assert unit_of_measurement is not None, 'unit of measurement cannot be None'
         assert state_func is not None, 'state_func cannot be None'
+        assert state_formatter_func is not None, 'state_formatter_func cannot be None'
 
         self._state_func = state_func
         self._state_formatter_func = state_formatter_func
@@ -39,7 +52,7 @@ class Sensor(_Base):
         })
 
         if state_topic is None:
-            self._state_topic = MqttTopic(mqtt, self.topic_name('state'))
+            self._state_topic = MqttTopic(kwargs['mqtt'], self.topic_name('state'))
             self._add_to_config({
                 'state_topic': self._state_topic.name()
             })
@@ -48,7 +61,7 @@ class Sensor(_Base):
             self._state_topic = state_topic
             self._add_to_config({
                 'state_topic': self._state_topic.name(),
-                'value_template': self._state_topic.add_entry(sensor_id, lambda: self._state_get_and_format()),
+                'value_template': self._state_topic.add_entry(self._component_id, lambda: self._state_get_and_format()),
             })
 
     def _state_get_and_format(self):
@@ -62,22 +75,33 @@ class Sensor(_Base):
 
 
 class SettableSensor(Sensor):
-    def __init__(self, sensor_id, sensor_name, unit_of_measurement, min_state, max_state, step_state, initial_state,
-                 state_change_func=lambda x: x, state_parser_func=state_parser,
-                 state_send_update_condition_func=state_send_update_condition, mqtt=None, **kwargs):
+    def __init__(
+            self,
+            sensor_name,
+            unit_of_measurement,
+            min_state,
+            max_state,
+            step_state,
+            initial_state,
+            state_change_func=state_change_func_default,
+            state_parser_func=state_parser_func_default,
+            state_send_update_condition_func=state_send_update_condition_func_default,
+            **kwargs
+    ):
         self._state = initial_state
-        super().__init__(sensor_id, sensor_name, unit_of_measurement, mqtt=mqtt, state_func=lambda: self._state,
-                         **kwargs)
         self._state_change_func = state_change_func
+        self._state_parser_func = state_parser_func
+        self._state_send_update_condition_func = state_send_update_condition_func
+
+        super().__init__(sensor_name, unit_of_measurement, state_func=lambda: self._state, **kwargs)
+
         self._min_state = min_state
         self._max_state = max_state
         self._step_state = step_state
-        self._state = initial_state
-        self._state_parser_func = state_parser_func
-        self._state_send_update_condition_func = state_send_update_condition_func
+
         self._cmd_topic = self.topic_name('cmd')
 
-        command_topic = MqttTopic(mqtt, self._cmd_topic)
+        command_topic = MqttTopic(kwargs['mqtt'], self._cmd_topic)
         command_topic.subscribe(lambda new_state: self._receive_command(new_state))
 
     def _receive_command(self, new_state):
@@ -104,10 +128,20 @@ class SettableSensor(Sensor):
 
 
 class ErrorSensor(Sensor):
-    def __init__(self, sensor_id, sensor_name, **kwargs):
+    def __init__(
+            self,
+            sensor_name,
+            **kwargs
+    ):
         self._errors = 0
-        super().__init__(sensor_id, sensor_name, 'errors', lambda: self._errors, state_formatter_no_decimals,
-                         icon='mdi:alarm-light', **kwargs)
+        super().__init__(
+            sensor_name,
+            'errors',
+            state_func=lambda: self._errors,
+            state_formatter_func=state_formatter_func_no_decimals,
+            icon='mdi:alarm-light',
+            **kwargs
+        )
 
     def wrap_function(self, func):
         def wrapper():
@@ -115,9 +149,7 @@ class ErrorSensor(Sensor):
                 return func()
             except:
                 self._errors = self._errors + 1
-                e = sys.exc_info()[0]
-                logging.error("Error: %s" % e)
-                traceback.print_exc(file=sys.stdout)
+                logging.error("Error in wrapped function", exc_info=True)
                 return None
 
         return wrapper

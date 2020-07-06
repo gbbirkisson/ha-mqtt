@@ -20,7 +20,7 @@ ALLOWED_COMPONENT_TYPES = [
 ]
 
 
-def topic_name(component_type=None, node_id=None, component_id=None):
+def _create_topic_name(component_type=None, node_id=None, component_id=None):
     assert component_type in ALLOWED_COMPONENT_TYPES, component_type + " is not allowed"
     assert component_id is not None, "component id cannot be None"
 
@@ -49,6 +49,9 @@ class Ha:
         self._node_id = node_id
         self._component_id = component_id
         self._auto_discovery = auto_discovery
+        self._add_to_config({
+            'unique_id': component_id
+        })
 
     def subscribe(self, topic, func):
         self._mqtt.subscribe(topic, func)
@@ -57,8 +60,8 @@ class Ha:
         self._mqtt.publish(topic, message)
 
     def topic_name(self, name):
-        return topic_name(component_type=self._component_type, node_id=self._node_id,
-                          component_id=self._component_id) + name
+        return _create_topic_name(component_type=self._component_type, node_id=self._node_id,
+                                  component_id=self._component_id) + name
 
     def _add_to_config(self, d):
         self._config.update(d)
@@ -77,8 +80,15 @@ class Ha:
 
 
 class _Base(Ha):
-    def __init__(self, mqtt=None, component_name=None, icon=None, availability_topic=False, **kwargs):
-        super().__init__(mqtt=mqtt, **kwargs)
+    def __init__(
+            self,
+            component_name=None,
+            icon=None,
+            device_class=None,
+            availability_topic=False,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
 
         self._component_name = component_name
         self._add_to_config({
@@ -91,9 +101,15 @@ class _Base(Ha):
                 'icon': icon
             })
 
+        self._device_class = device_class
+        if device_class is not None:
+            self._add_to_config({
+                'device_class': device_class
+            })
+
         self._availability_topic = None
         if availability_topic:
-            self._availability_topic = MqttTopic(mqtt, self.topic_name('available'))
+            self._availability_topic = MqttTopic(kwargs['mqtt'], self.topic_name('available'))
             self._add_to_config({
                 'availability_topic': self._availability_topic.name(),
                 'payload_available': 'online',

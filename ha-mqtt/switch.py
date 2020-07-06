@@ -1,5 +1,6 @@
 from ha import _Base
 from mqtt import MqttTopic, MqttSharedTopic
+from util import create_id
 
 
 def _state_format(state):
@@ -7,12 +8,20 @@ def _state_format(state):
 
 
 class Switch(_Base):
-    def __init__(self, switch_id, switch_name, state_change_func=None, state_topic=None, mqtt=None, **kwargs):
-        super().__init__(mqtt=mqtt, component_id=switch_id, component_name=switch_name, component_type='switch',
-                         **kwargs)
+    def __init__(
+            self,
+            switch_name,
+            switch_id=None,
+            state_change_func=None,
+            state_topic=None,
+            **kwargs
+    ):
+        super().__init__(component_id=create_id(switch_id, switch_name), component_name=switch_name,
+                         component_type='switch', **kwargs)
+
         assert state_change_func is not None, 'switch_func cannot be None'
 
-        command_topic = MqttTopic(mqtt, self.topic_name('cmd'))
+        command_topic = MqttTopic(kwargs['mqtt'], self.topic_name('cmd'))
         self._state_change_func = state_change_func
         self._state = False
 
@@ -25,7 +34,7 @@ class Switch(_Base):
         })
 
         if state_topic is None:
-            self._state_topic = MqttTopic(mqtt, self.topic_name('state'))
+            self._state_topic = MqttTopic(kwargs['mqtt'], self.topic_name('state'))
             self._add_to_config({
                 'state_topic': self._state_topic.name()
             })
@@ -34,7 +43,7 @@ class Switch(_Base):
             self._state_topic = state_topic
             self._add_to_config({
                 'state_topic': self._state_topic.name(),
-                'value_template': self._state_topic.add_entry(switch_id, lambda: _state_format(self._state)),
+                'value_template': self._state_topic.add_entry(self._component_id, lambda: _state_format(self._state)),
             })
 
         command_topic.subscribe(lambda new_state: self._receive_command(new_state))

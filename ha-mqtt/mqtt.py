@@ -8,14 +8,19 @@ class Mqtt:
     _mqtt_client = None
     _mqtt_subs = {}
 
-    def __init__(self, mqtt_host=None, mqtt_username=None, mqtt_password=None):
+    def __init__(
+            self,
+            mqtt_host=None,
+            mqtt_username=None,
+            mqtt_password=None
+    ):
         assert mqtt_host is not None, 'host id cannot be None'
 
         self._host = mqtt_host
         self._mqtt_client = Client()
-        logger = logging.getLogger(__package__)
-        logger.setLevel(logging.WARN)
-        self._mqtt_client.enable_logger(logger)
+        _mqtt_logger = logging.getLogger('mqtt.client')
+        _mqtt_logger.setLevel(logging.WARN)
+        self._mqtt_client.enable_logger(_mqtt_logger)
 
         if mqtt_username is not None and mqtt_password is not None:
             logging.info('MQTT connecting with user and pass')
@@ -51,8 +56,11 @@ class Mqtt:
         if type(message) is dict:
             message = json.dumps(message)
         message = message if message is not None else ""
-        logging.debug('MQTT msg sent on topic {}: {}'.format(topic, message))
-        self._mqtt_client.publish(topic, message)
+        r = self._mqtt_client.publish(topic, message)
+        if r.rc != 0:
+            logging.warning('MQTT msg failed to send on topic {}: {}'.format(topic, message))
+        else:
+            logging.debug('MQTT msg sent on topic {}: {}'.format(topic, message))
 
     def __enter__(self):
         logging.info('MQTT connecting to host {}'.format(self._host))
@@ -64,22 +72,6 @@ class Mqtt:
         logging.info('MQTT disconnecting from host {}'.format(self._host))
         self._mqtt_client.loop_stop()
         self._mqtt_client.disconnect()
-
-    # def receive(self, topic):
-    #     def real_decorator(func):
-    #         self._mqtt_client.subscribe(topic, func)
-    #         return func
-    #
-    #     return real_decorator
-    #
-    # def send(self, topic):
-    #     def real_decorator(func):
-    #         def wrapper(*args, **kwargs):
-    #             self._mqtt_client.publish(topic, func(*args, **kwargs))
-    #
-    #         return wrapper
-    #
-    #     return real_decorator
 
 
 class MqttTopic:

@@ -1,5 +1,10 @@
 from ha import _Base
 from mqtt import MqttTopic, MqttSharedTopic
+from util import create_id
+
+
+def default_state_change_func(mode, target):
+    pass
 
 
 def temp_formatter(state):
@@ -7,11 +12,22 @@ def temp_formatter(state):
 
 
 class Climate(_Base):
-    def __init__(self, climate_id, climate_name, thermometer, heat=True, cool=False, state_change_func=lambda x, y: x,
-                 temp_min=0, temp_max=100, temp_step=1,
-                 temp_formatter_func=temp_formatter,
-                 mqtt=None, state_topic=None, **kwargs):
-        super().__init__(mqtt=mqtt, component_id=climate_id, component_name=climate_name, component_type='climate',
+    def __init__(
+            self,
+            climate_name,
+            thermometer,
+            climate_id=None,
+            heat=True,
+            cool=False,
+            state_change_func=default_state_change_func,
+            temp_min=0,
+            temp_max=100,
+            temp_step=1,
+            temp_formatter_func=temp_formatter,
+            state_topic=None,
+            **kwargs):
+        super().__init__(component_id=create_id(climate_id, climate_name), component_name=climate_name,
+                         component_type='climate',
                          **kwargs)
 
         assert state_change_func is not None, 'state_change_func cannot be None'
@@ -30,8 +46,8 @@ class Climate(_Base):
         if cool:
             modes.append('cool')
 
-        topic_command_mode = MqttTopic(mqtt, self.topic_name('cmdMode'))
-        topic_command_target_temp = MqttTopic(mqtt, self.topic_name('cmdTargetTemp'))
+        topic_command_mode = MqttTopic(kwargs['mqtt'], self.topic_name('cmdMode'))
+        topic_command_target_temp = MqttTopic(kwargs['mqtt'], self.topic_name('cmdTargetTemp'))
 
         self._add_to_config({
             'min_temp': str(temp_min),
@@ -43,9 +59,9 @@ class Climate(_Base):
         })
 
         if state_topic is None:
-            self._topic_state_mode = MqttTopic(mqtt, self.topic_name('stateMode'))
-            self._topic_state_curr_temp = MqttTopic(mqtt, self.topic_name('stateCurrTemp'))
-            self._topic_state_target_temp = MqttTopic(mqtt, self.topic_name('stateTargetTemp'))
+            self._topic_state_mode = MqttTopic(kwargs['mqtt'], self.topic_name('stateMode'))
+            self._topic_state_curr_temp = MqttTopic(kwargs['mqtt'], self.topic_name('stateCurrTemp'))
+            self._topic_state_target_temp = MqttTopic(kwargs['mqtt'], self.topic_name('stateTargetTemp'))
             self._add_to_config({
                 'mode_state_topic': self._topic_state_mode.name(),
                 'current_temperature_topic': self._topic_state_curr_temp.name(),
@@ -58,13 +74,13 @@ class Climate(_Base):
             self._topic_state_target_temp = state_topic
             self._add_to_config({
                 'mode_state_topic': self._topic_state_mode.name(),
-                'mode_state_template': self._topic_state_mode.add_entry(climate_id + '_mode', lambda: self._mode),
+                'mode_state_template': self._topic_state_mode.add_entry(self._component_id + '_mode', lambda: self._mode),
                 'current_temperature_topic': self._topic_state_curr_temp.name(),
-                'current_temperature_template': self._topic_state_curr_temp.add_entry(climate_id + '_curr_temp',
+                'current_temperature_template': self._topic_state_curr_temp.add_entry(self._component_id + '_curr_temp',
                                                                                       lambda: self._temp_formatter_func(
                                                                                           self._thermometer())),
                 'temperature_state_topic': self._topic_state_mode.name(),
-                'temperature_state_template': self._topic_state_mode.add_entry(climate_id + '_target_temp',
+                'temperature_state_template': self._topic_state_mode.add_entry(self._component_id + '_target_temp',
                                                                                lambda: self._temp_formatter_func(
                                                                                    self._target))
             })

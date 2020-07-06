@@ -1,28 +1,25 @@
-import time
-
 import yaml
 
 from climate import Climate
 from sensor import Sensor, SettableSensor
 from switch import Switch
+from util import sleep_for
 
 
 class ComponentRegistry:
     def __init__(self):
         self._components = []
-        self._components_to_update = []
         self._shared_topics = []
 
-    def add_component(self, component, skip_update=False):
+    def _add_component(self, component, send_updates):
+        self._components.append((component, send_updates))
+
+    def add_component(self, component, send_updates=True):
         if isinstance(component, list):
             for c in component:
-                self._components.append(c)
-                if not skip_update:
-                    self._components_to_update.append(c)
+                self._add_component(c, send_updates)
         else:
-            self._components.append(component)
-            if not skip_update:
-                self._components_to_update.append(component)
+            self._add_component(component, send_updates)
 
     def add_shared_topic(self, topic):
         if isinstance(topic, list):
@@ -32,8 +29,9 @@ class ComponentRegistry:
             self._shared_topics.append(topic)
 
     def send_updates(self):
-        for c in self._components_to_update:
-            c.send_update()
+        for c, send_updates in self._components:
+            if send_updates:
+                c.send_update()
         for q in self._shared_topics:
             q.publish()
 
@@ -44,7 +42,7 @@ class ComponentRegistry:
         input_number = {}
         automation = []
 
-        for c in self._components:
+        for c, _ in self._components:
             tmp = c.get_config()
             tmp['platform'] = 'mqtt'
             if issubclass(type(c), Climate):
@@ -102,15 +100,15 @@ class ComponentRegistry:
         }, encoding='utf-8', allow_unicode=True, default_flow_style=False, explicit_start=True).decode("utf-8")
 
     def __enter__(self):
-        for c in self._components:
+        for c, _ in self._components:
             c.__enter__()
 
-        time.sleep(1)  # Give home assistant a chance to catch up
+        sleep_for(1)  # Give home assistant a chance to catch up
 
-        for c in self._components:
+        for c, _ in self._components:
             c.available_set(True)
         return self
 
     def __exit__(self, *args):
-        for c in self._components:
+        for c, _ in self._components:
             c.__exit__(args)
