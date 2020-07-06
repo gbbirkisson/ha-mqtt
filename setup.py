@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="ha-mqtt",
+    name="ha_mqtt",
     version="0.0.1",
     author="Guðmundur Björn Birkisson",
     author_email="gbbirkisson@gmail.com",
