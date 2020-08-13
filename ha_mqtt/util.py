@@ -9,21 +9,21 @@ def env(key, default=None):
 
 
 def env_float(key, default=None):
-    r = env(key, str(default))
+    r = env(key)
     if r is None:
         return default
     return float(r)
 
 
 def env_int(key, default=None):
-    r = env(key, str(default))
+    r = env(key)
     if r is None:
         return default
     return int(r)
 
 
 def env_bool(key, default=None):
-    r = env(key, str(default))
+    r = env(key)
     if r is None:
         default
     return r.lower() in ['1', 'true', 'yes', 'y']
