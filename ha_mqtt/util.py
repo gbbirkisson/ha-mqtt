@@ -53,7 +53,8 @@ def setup_logging():
 
 def sleep_for(t):
     try:
-        time.sleep(t)
+        if t > 0:
+            time.sleep(t)
     except:
         pass
 

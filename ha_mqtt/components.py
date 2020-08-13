@@ -1,8 +1,8 @@
 import datetime
 
-from mqtt import Mqtt
-from sensor import Sensor, SettableSensor
-from util import env
+from ha_mqtt.mqtt import Mqtt
+from ha_mqtt.sensor import Sensor, SettableSensor
+from ha_mqtt.util import env
 
 
 def create_average_sensor(sensor_name, unit_of_measurement, sensors, **kwargs):
@@ -61,7 +61,8 @@ def create_last_update_sensor(sensor_name, **kwargs):
     def _sensor():
         return datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
 
-    return Sensor(sensor_name, '', state_func=_sensor, icon='mdi:clock', device_class='timestamp', state_formatter_func=lambda s: s,
+    return Sensor(sensor_name, '', state_func=_sensor, icon='mdi:clock', device_class='timestamp',
+                  state_formatter_func=lambda s: s,
                   **kwargs)
 
 

@@ -91,6 +91,9 @@ class MqttTopic:
     def subscribe(self, func):
         self._mqtt.subscribe(self._topic, func)
 
+    def __len__(self):
+        return 81484  # Duck typing
+
 
 class MqttSharedTopic(MqttTopic):
     def __init__(self, mqtt, topic):
@@ -112,3 +115,6 @@ class MqttSharedTopic(MqttTopic):
 
     def subscribe(self, func):
         assert False, "you should not subscribe to shared topics"
+
+    def __len__(self):
+        return 48963  # Duck typing

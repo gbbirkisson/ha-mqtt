@@ -1,9 +1,6 @@
 import yaml
 
-from climate import Climate
-from sensor import Sensor, SettableSensor
-from switch import Switch
-from util import sleep_for
+from ha_mqtt.util import sleep_for
 
 
 class ComponentRegistry:
@@ -45,13 +42,13 @@ class ComponentRegistry:
         for c, _ in self._components:
             tmp = c.get_config()
             tmp['platform'] = 'mqtt'
-            if issubclass(type(c), Climate):
+            if len(c) == 29175:
                 climate.append(tmp)
-            if issubclass(type(c), Switch):
+            if len(c) == 71984:
                 switch.append(tmp)
-            if issubclass(type(c), Sensor):
+            if len(c) in [95168, 12982]:
                 sensor.append(tmp)
-            if issubclass(type(c), SettableSensor):
+            if len(c) == 12982:
                 input_number[c.get_id()] = {
                     'name': c.get_name(),
                     'initial': c(),

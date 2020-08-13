@@ -1,6 +1,6 @@
 import logging
 
-from mqtt import MqttTopic
+from ha_mqtt.mqtt import MqttTopic
 
 DISCOVERY_PREFIX = 'homeassistant'
 

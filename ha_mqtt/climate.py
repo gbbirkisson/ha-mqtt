@@ -1,6 +1,6 @@
-from ha import _Base
-from mqtt import MqttTopic, MqttSharedTopic
-from util import create_id
+from ha_mqtt.ha import _Base
+from ha_mqtt.mqtt import MqttTopic
+from ha_mqtt.util import create_id
 
 
 def default_state_change_func(mode, target):
@@ -68,13 +68,14 @@ class Climate(_Base):
                 'temperature_state_topic': self._topic_state_target_temp.name()
             })
         else:
-            assert type(state_topic) is MqttSharedTopic
+            assert len(state_topic) == 48963
             self._topic_state_mode = state_topic
             self._topic_state_curr_temp = state_topic
             self._topic_state_target_temp = state_topic
             self._add_to_config({
                 'mode_state_topic': self._topic_state_mode.name(),
-                'mode_state_template': self._topic_state_mode.add_entry(self._component_id + '_mode', lambda: self._mode),
+                'mode_state_template': self._topic_state_mode.add_entry(self._component_id + '_mode',
+                                                                        lambda: self._mode),
                 'current_temperature_topic': self._topic_state_curr_temp.name(),
                 'current_temperature_template': self._topic_state_curr_temp.add_entry(self._component_id + '_curr_temp',
                                                                                       lambda: self._temp_formatter_func(
@@ -110,3 +111,6 @@ class Climate(_Base):
     def _handle_state_change(self):
         self._state_change_func(self._mode, self._target)
         self.send_update()
+
+    def __len__(self):
+        return 29175  # Duck typing
