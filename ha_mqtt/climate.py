@@ -105,8 +105,11 @@ class Climate(_Base):
             self._topic_state_target_temp.publish(self._temp_formatter_func(self._target))
             self._handle_state_change()
 
-    def send_update(self):
+    def send_update(self, all_topics=False):
         self._topic_state_curr_temp.publish(self._temp_formatter_func(self._thermometer()))
+        if all_topics:
+            self._topic_state_mode.publish(self._mode)
+            self._topic_state_target_temp.publish(self._temp_formatter_func(self._target))
 
     def _handle_state_change(self):
         self._state_change_func(self._mode, self._target)

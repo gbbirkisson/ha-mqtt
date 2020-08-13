@@ -25,9 +25,9 @@ class ComponentRegistry:
         else:
             self._shared_topics.append(topic)
 
-    def send_updates(self):
+    def send_updates(self, force_all=False):
         for c, send_updates in self._components:
-            if send_updates:
+            if send_updates or force_all:
                 c.send_update()
         for q in self._shared_topics:
             q.publish()
