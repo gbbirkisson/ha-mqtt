@@ -25,7 +25,7 @@ def env_int(key, default=None):
 def env_bool(key, default=None):
     r = env(key)
     if r is None:
-        default
+        return default
     return r.lower() in ['1', 'true', 'yes', 'y']
 
 
