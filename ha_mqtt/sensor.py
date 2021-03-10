@@ -149,6 +149,9 @@ class ErrorSensor(Sensor):
             **kwargs
         )
 
+    def reset(self):
+        self._errors = 0
+
     def wrap_function(self, func):
         def wrapper():
             try:
