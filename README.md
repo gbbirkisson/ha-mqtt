@@ -3,8 +3,6 @@
 
 A library for creating MQTT components for [Home Assistant](https://www.home-assistant.io/). Used in my [PID controller project](https://github.com/gbbirkisson/hass-pid-thermostat/).
 
-<h1>Table of Contents</h1>
-
 - [Setup](#setup)
 - [Usage](#usage)
 
