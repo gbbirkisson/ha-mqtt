@@ -1,3 +1,4 @@
+<img align="right" width="128" height="128" src="logo.png">
 <h1>ha-mqtt</h1>
 
 A library for creating MQTT components for [Home Assistant](https://www.home-assistant.io/). Used in my [PID controller project](https://github.com/gbbirkisson/hass-pid-thermostat/).
